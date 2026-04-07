@@ -55,7 +55,6 @@ autovadataja-tests/
 
 ## Resursi
 
-- [MDN Web Docs — JavaScript](https://developer.mozilla.org/lv/docs/Web/JavaScript)
 - [W3C Validator](https://validator.w3.org/)
 - [Google Lighthouse / PageSpeed](https://pagespeed.web.dev/)
 - [WAVE Pieejamības pārbaude](https://wave.webaim.org)
