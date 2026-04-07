@@ -63,6 +63,4 @@ autovadataja-tests/
 
 ---
 
-## Autori
 
-2026: RTK audzēknis
