@@ -730,35 +730,36 @@ const questionsA = [
         ]
     }
 ];
-// --- KONSTANTES ---
-// --- KONSTANTES ---
+// --- KONSTANTES UN MAINĪGIE ---
+
+// Burtu apzīmējumi atbilžu variantiem (A, B, C, D)
 const BURTI = ['A', 'B', 'C', 'D'];
 
-// Mainīgie, kas mainās atkarībā no kategorijas
-let laiksSekundes = 1500;
-let izturetSlieksnis = 35; // iekšējai lietošanai, neparādām
-let jautajumuSkaits = 50;
+// Šie mainīgie tiek iestatīti atkarībā no izvēlētās kategorijas
+let laiksSekundes = 1500;        // Kopējais laiks sekundēs (B kat. 25 min)
+let izturetSlieksnis = 35;       // Cik pareizas atbildes vajag, lai izturētu (B kat. 35)
+let jautajumuSkaits = 50;        // Jautājumu skaits testā
 
-// --- MAINĪGIE ---
-let esosieJautajumi = [];
-let izveletaKategorija = null;
-let jautIdx = 0;
-let pareizas = 0;
-let timeris = null;
-let atlikusaisLaiks = laiksSekundes;
-let atbildeIzv = false;
+// --- GLOBĀLIE MAINĪGIE TESTA STĀVOKĻA GLABĀŠANAI ---
+let esosieJautajumi = [];        // Masīvs ar jautājumiem izvēlētajai kategorijai
+let izveletaKategorija = null;   // 'B' vai 'A'
+let jautIdx = 0;                 // Kuru jautājumu šobrīd rāda (indekss)
+let pareizas = 0;                // Cik pareizas atbildes šajā testā
+let timeris = null;              // setInterval mainīgais taimerim
+let atlikusaisLaiks = laiksSekundes; // Laiks, kas atlicis līdz beigām
+let atbildeIzv = false;          // Vai uz šo jautājumu jau ir atbildēts
 
-// --- ELEMENTI ---
+// --- HTML ELEMENTU IEGŪŠANA ---
 const katEkrans = document.getElementById('category-screen');
-const sakEkrans   = document.getElementById('start-screen');
+const sakEkrans = document.getElementById('start-screen');
 const testaEkrans = document.getElementById('quiz-screen');
-const rezEkrans   = document.getElementById('result-screen');
-const pogaB      = document.getElementById('category-b-btn');
-const pogaA      = document.getElementById('category-a-btn');
-const pogaSakt   = document.getElementById('start-btn');
+const rezEkrans = document.getElementById('result-screen');
+const pogaB = document.getElementById('category-b-btn');
+const pogaA = document.getElementById('category-a-btn');
+const pogaSakt = document.getElementById('start-btn');
 const pogaAtkart = document.getElementById('retry-btn');
-const pogaNak   = document.getElementById('next-btn');
-const timerEl    = document.getElementById('timer');
+const pogaNak = document.getElementById('next-btn');
+const timerEl = document.getElementById('timer');
 const timerKaste = document.getElementById('timer-box');
 const progresaJosla = document.getElementById('progress-bar');
 const jautSkaititajs = document.getElementById('q-counter');
@@ -767,46 +768,62 @@ const atbildesDiv = document.getElementById('answers');
 const jautAttels = document.getElementById('question-image');
 const attTukšais = document.getElementById('img-placeholder');
 
-// --- NOTIKUMU KLAUSĪTĀJI ---
+// --- NOTIKUMU KLAUSĪTĀJI (pogu klikšķi) ---
 pogaB.addEventListener('click', function() { izveletiesKat('B'); });
 pogaA.addEventListener('click', function() { izveletiesKat('A'); });
 pogaSakt.addEventListener('click', saktTestu);
 pogaAtkart.addEventListener('click', function() {
+    // Atgriežamies uz kategorijas izvēles ekrānu
     paraditEkranu(katEkrans);
 });
 pogaNak.addEventListener('click', nakamaisJaut);
 
 // --- FUNKCIJAS ---
 
+/**
+ * Izvēlas kategoriju (B vai A) un parāda sākuma ekrānu ar statistiku.
+ * @param {string} kat - 'B' vai 'A'
+ */
 function izveletiesKat(kat) {
     izveletaKategorija = kat;
+    // Ielādējam atbilstošo jautājumu masīvu
     esosieJautajumi = kat === 'B' ? questions : questionsA;
     
+    // Uzstādam parametrus atkarībā no kategorijas
     if (kat === 'B') {
-        laiksSekundes = 1500;
-        izturetSlieksnis = 35;
+        laiksSekundes = 1500;      // 25 minūtes
+        izturetSlieksnis = 35;     // 70% no 50
         jautajumuSkaits = 50;
     } else {
-        laiksSekundes = 900;
-        izturetSlieksnis = 21;
+        laiksSekundes = 900;       // 15 minūtes
+        izturetSlieksnis = 21;     // 70% no 30
         jautajumuSkaits = 30;
     }
     
+    // Atjauninām informāciju sākuma ekrānā
     atjauninatSakumaEkranu();
+    // Parādam sākuma ekrānu
     paraditEkranu(sakEkrans);
 }
 
+/**
+ * Atjauno sākuma ekrāna statistiku (jautājumu skaits un laiks).
+ */
 function atjauninatSakumaEkranu() {
     const minutes = Math.floor(laiksSekundes / 60);
     const statNum = document.querySelectorAll('#start-screen .stat-num');
     statNum[0].textContent = jautajumuSkaits;
     statNum[1].textContent = minutes + ':00';
     
+    // Apraksts zem virsraksta
     document.querySelector('#start-screen .hero-desc').innerHTML = 
         jautajumuSkaits + ' jautājumi par ceļu satiksmes noteikumiem ar attēliem. Laiks: <strong>' + 
         minutes + ' minūtes</strong>.';
 }
 
+/**
+ * Sāk testu - atiestata mainīgos un parāda pirmo jautājumu.
+ */
 function saktTestu() {
     jautIdx = 0;
     pareizas = 0;
@@ -814,29 +831,38 @@ function saktTestu() {
     atbildeIzv = false;
 
     paraditEkranu(testaEkrans);
-    saktTimeri();
-    raditJautajumu();
+    saktTimeri();          // Iedarbinām taimeri
+    raditJautajumu();      // Attēlojam pirmo jautājumu
 }
 
+/**
+ * Parāda norādīto ekrānu un paslēpj pārējos.
+ * @param {HTMLElement} ekrans - Ekrāna elements, ko rādīt
+ */
 function paraditEkranu(ekrans) {
     [katEkrans, sakEkrans, testaEkrans, rezEkrans].forEach(el => el.classList.remove('active'));
     ekrans.classList.add('active');
 }
 
+/**
+ * Attēlo pašreizējo jautājumu (tekstu, attēlu, atbilžu pogas).
+ */
 function raditJautajumu() {
-    atbildeIzv = false;
-    pogaNak.style.display = 'none';
-    atbildesDiv.innerHTML = '';
+    atbildeIzv = false;           // Jauns jautājums - vēl nav atbildēts
+    pogaNak.style.display = 'none'; // Paslēpjam "Nākamais" pogu
+    atbildesDiv.innerHTML = '';    // Iztīrām vecās atbildes
 
     const jaut = esosieJautajumi[jautIdx];
 
-    // progresa josla
+    // Aprēķinām progresa joslas platumu
     const progress = (jautIdx / esosieJautajumi.length) * 100;
     progresaJosla.style.width = progress + '%';
     jautSkaititajs.textContent = (jautIdx + 1) + ' / ' + esosieJautajumi.length;
 
+    // Iestatām jautājuma tekstu
     jautTeksts.textContent = jaut.question;
 
+    // Parādam attēlu, ja tāds ir, citādi rādām tukšo vietu
     if (jaut.image) {
         jautAttels.src = jaut.image;
         jautAttels.style.display = 'block';
@@ -846,29 +872,37 @@ function raditJautajumu() {
         attTukšais.style.display = 'flex';
     }
 
+    // Izveidojam atbilžu pogas
     jaut.answers.forEach(function(atb, i) {
         const poga = document.createElement('button');
         poga.classList.add('answer-btn');
+        // Katrai pogai pievienojam burtu un atbildes tekstu
         poga.innerHTML = '<span class="letter">' + BURTI[i] + '</span>' +
                          '<span class="answer-text">' + atb.text + '</span>';
-        poga.dataset.pareiza = atb.correct;
+        poga.dataset.pareiza = atb.correct; // Saglabājam, vai atbilde ir pareiza
         poga.addEventListener('click', izveletiesAtbildi);
         atbildesDiv.appendChild(poga);
     });
 }
 
+/**
+ * Apstrādā lietotāja atbildes izvēli.
+ * @param {Event} e - Klikšķa notikums
+ */
 function izveletiesAtbildi(e) {
-    if (atbildeIzv) return;
+    if (atbildeIzv) return; // Ja jau atbildēts, neko nedarām
     atbildeIzv = true;
 
     const poga = e.currentTarget;
     const irPareiza = poga.dataset.pareiza === 'true';
 
+    // Iekrāsojam pogu atkarībā no pareizības
     if (irPareiza) {
         poga.classList.add('pareizi');
-        pareizas++;
+        pareizas++; // Palielinām pareizo atbilžu skaitu
     } else {
         poga.classList.add('nepareizi');
+        // Parādam, kura bija pareizā atbilde
         atbildesDiv.querySelectorAll('.answer-btn').forEach(function(btn) {
             if (btn.dataset.pareiza === 'true') {
                 btn.classList.add('pareizi');
@@ -876,27 +910,37 @@ function izveletiesAtbildi(e) {
         });
     }
 
+    // Atspējojam visas atbilžu pogas, lai nevarētu mainīt izvēli
     atbildesDiv.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
+    // Parādam "Nākamais" pogu
     pogaNak.style.display = 'flex';
 }
 
+/**
+ * Pāriet uz nākamo jautājumu vai parāda rezultātus, ja jautājumi beigušies.
+ */
 function nakamaisJaut() {
     jautIdx++;
     if (jautIdx < esosieJautajumi.length) {
-        raditJautajumu();
+        raditJautajumu(); // Vēl ir jautājumi
     } else {
         apturetTimeri();
-        paraditRezultatus(false);
+        paraditRezultatus(false); // Beigušies jautājumi, laiks vēl nav beidzies
     }
 }
 
+/**
+ * Parāda rezultātu ekrānu ar statistiku.
+ * @param {boolean} laiksBeidzies - Vai laiks beidzās pirms visiem jautājumiem
+ */
 function paraditRezultatus(laiksBeidzies) {
-    apturetTimeri();
+    apturetTimeri(); // Apturam taimeri
     paraditEkranu(rezEkrans);
 
     const procenti = Math.round((pareizas / esosieJautajumi.length) * 100);
     const izturets = pareizas >= izturetSlieksnis;
 
+    // Iestatām ikonu un virsrakstu
     document.getElementById('result-icon').textContent = izturets ? '🏆' : '❌';
     document.getElementById('result-title').textContent = izturets ? 'Apsveicam!' : 'Neizdevās';
 
@@ -904,6 +948,7 @@ function paraditRezultatus(laiksBeidzies) {
     scoreEl.textContent = pareizas + ' / ' + esosieJautajumi.length;
     scoreEl.className = 'result-score ' + (izturets ? 'izturets' : 'neizturets');
 
+    // Izveidojam paziņojuma tekstu
     let zina = '';
     if (laiksBeidzies) {
         zina = 'Laiks beidzās! Tu atbildēji uz ' + pareizas + ' no ' + esosieJautajumi.length + ' jautājumiem.';
@@ -914,14 +959,18 @@ function paraditRezultatus(laiksBeidzies) {
     }
     document.getElementById('result-msg').textContent = zina;
 
+    // Detalizēts sadalījums
     document.getElementById('result-breakdown').innerHTML =
         '✅ Pareizās atbildes: <strong>' + pareizas + '</strong><br>' +
         '❌ Nepareizās atbildes: <strong>' + (esosieJautajumi.length - pareizas) + '</strong><br>' +
         '📊 Rezultāts: <strong>' + procenti + '%</strong>';
 }
 
+/**
+ * Sāk taimeri, kas skaita atlikušo laiku.
+ */
 function saktTimeri() {
-    apturetTimeri();
+    apturetTimeri(); // Notīrām iepriekšējo taimeri, ja tāds bija
     atlikusaisLaiks = laiksSekundes;
     atjauninatTimeri(atlikusaisLaiks);
 
@@ -929,27 +978,36 @@ function saktTimeri() {
         atlikusaisLaiks--;
         atjauninatTimeri(atlikusaisLaiks);
 
+        // Ja laiks beidzies, apturam taimeri un rādam rezultātus
         if (atlikusaisLaiks <= 0) {
             apturetTimeri();
             paraditRezultatus(true);
         }
-    }, 1000);
+    }, 1000); // Izsauc katru sekundi
 }
 
+/**
+ * Aptur taimeri.
+ */
 function apturetTimeri() {
     clearInterval(timeris);
     timeris = null;
 }
 
+/**
+ * Atjauno taimera rādījumu ekrānā un maina krāsu, ja laika maz.
+ * @param {number} sek - Atlikušās sekundes
+ */
 function atjauninatTimeri(sek) {
     const min = Math.floor(sek / 60);
     const sekundes = sek % 60;
     timerEl.textContent = min + ':' + sekundes.toString().padStart(2, '0');
 
+    // Brīdinājuma krāsas
     timerKaste.classList.remove('warning', 'danger');
     if (sek <= 30) {
-        timerKaste.classList.add('danger');
+        timerKaste.classList.add('danger');    // Sarkans, ja mazāk par 30 sek.
     } else if (sek <= 90) {
-        timerKaste.classList.add('warning');
+        timerKaste.classList.add('warning');   // Dzeltens, ja mazāk par 1.5 min.
     }
 }
