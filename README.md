@@ -32,6 +32,7 @@ Visi ekrāni (kategorijas izvēle, sākuma ekrāns, testa ekrāns, rezultātu ek
 - Pašlaik visi jautājumi ir iekļauti tieši JavaScript masīvos, tāpēc tos nevar ērti rediģēt bez programmēšanas zināšanām.
 - Taimeris turpina skaitīt laiku pat tad, ja pārlūkprogrammas cilne nav aktīva (tas ir standarta uzvedība, bet varētu pievienot pauzēšanu).
 - Rezultātu ekrānā vienmēr tiek rādīts, vai lietotājs veiksmīgi izpildija eksāmenu, bet netiek saglabāta vēsture.
+- Neizmantoju labāku, vēlamo metodi, lai importētu bildes.
 
 ## Resursi
 Izstrādē izmantotie resursi un noderīgas saites:
