@@ -44,3 +44,5 @@ Izstrādē izmantotie resursi un noderīgas saites:
 - [Rīku saraksts (RTK2023)](https://rtk2023.github.io/riki/)
 - [Projekta GitHub repozitorijs](https://github.com/rtk2023/riki)
 
+## Autori
+2026: Dominiks Zaikovskis, Filips Bībers P23-2
