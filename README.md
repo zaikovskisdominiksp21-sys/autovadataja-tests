@@ -1,7 +1,7 @@
 # Autovadītāja teorijas tests (Apmācību versija)
 
 ## Ievads
-Šis ir treniņa rīks, kas palīdz sagatavoties CSDD autovadītāja teorijas eksāmenam. Tas satur 50 jautājumus B kategorijai un 30 jautājumus A kategorijai. Lietotājs var izvēlēties kategoriju, atbildēt uz jautājumiem ar attēliem un saņemt tūlītēju atgriezenisko saiti par savu rezultātu. Rīks izveidots praktiskā darba ietvaros programmēšanas stundās.
+Šis ir treniņa rīks, kas palīdz sagatavoties CSDD autovadītāja teorijas eksāmenam. Tas satur 50 jautājumus B kategorijai un 30 jautājumus A kategorijai. Lietotājs var izvēlēties kategoriju, atbildēt uz jautājumiem ar attēliem un saņemt tūlītēju atgriezenisko saiti par savu rezultātu. Rīks izveidots praktiskā darba ietvaros.
 
 ## Pārskats
 Rīks sastāv no trim galvenajiem failiem:
